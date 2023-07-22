@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import BasicMenu from './components/BasicMenu';
 import Sessions from './components/Sessions';
 
 const Home = () => (
@@ -13,7 +13,7 @@ const Home = () => (
 const App = () => (
   <Router>
     <div>
-      <Navbar />
+      <BasicMenu />
 
       <Routes>
         <Route path="/" element={<Home />} />
