@@ -12,6 +12,8 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import StopIcon from '@mui/icons-material/Stop';
 
 const Sessions = () => {
   const [sessions, setSessions] = useState([]);
@@ -27,7 +29,33 @@ const Sessions = () => {
       console.error('Error submitting data:', error);
     }
   };
-  
+
+  const deleteSession = async (sessionId) => {
+    console.log(sessionId)
+    try {
+      const response = await axios.delete(`${API_URL}/${sessionId}`);
+      setSessions((prevSessions) => prevSessions.filter((session) => session.id !== sessionId));
+    } catch (error) {
+      console.error('Error submitting data:', error);
+    }
+  };
+
+  const endSession = async (sessionId) => {
+    console.log(sessionId)
+    try {
+      const response = await axios.patch(`${API_URL}/sessions/${sessionId}/end`);
+      setSessions((prevSessions) =>
+        prevSessions.map((session) => {
+          if (session.id === sessionId) {
+            return response.data;
+          }
+          return session;
+        })
+      );
+    } catch (error) {
+      console.error('Error submitting data:', error);
+    }
+  };  
 
   useEffect(() => {
     // Function to fetch data from the API
@@ -73,6 +101,7 @@ const Sessions = () => {
             <TableCell align="right">Status</TableCell>
             <TableCell align="right">Created On</TableCell>
             <TableCell align="right">Ended On</TableCell>
+            <TableCell align="right">Actions</TableCell>
             </TableRow>
         </TableHead>
         <TableBody>
@@ -88,6 +117,15 @@ const Sessions = () => {
                 <TableCell align="right">{session.status}</TableCell>
                 <TableCell align="right">{session.createdOn}</TableCell>
                 <TableCell align="right">{session.endedOn}</TableCell>
+                <TableCell align="right">
+
+                    <IconButton color="secondary" onClick={() => endSession(session.id)}>
+                        <StopIcon />
+                    </IconButton>
+                    <IconButton color="error" onClick={() => deleteSession(session.id)}>
+                        <DeleteForeverIcon />
+                    </IconButton>
+                </TableCell>
             </TableRow>
             ))}
         </TableBody>
