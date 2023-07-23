@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; 
 import axios from 'axios';
 import { API_URL } from '../config/config';
 import Table from '@mui/material/Table';
@@ -11,9 +12,10 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
-import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import StopIcon from '@mui/icons-material/Stop';
+import Session from './Session';
 
 const Sessions = () => {
   const [sessions, setSessions] = useState([]);
@@ -58,14 +60,13 @@ const Sessions = () => {
   };  
 
   useEffect(() => {
-    // Function to fetch data from the API
     const fetchSessions = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/sessions`); // Replace with the actual API URL for sessions
-        setSessions(response.data);
-      } catch (error) {
-        console.error('Error fetching sessions:', error);
-      }
+        try {
+            const response = await axios.get(`${API_URL}/sessions`);
+            setSessions(response.data);
+        } catch (error) {
+            console.error('Error fetching sessions:', error);
+        }
     };
 
     fetchSessions();
@@ -74,23 +75,22 @@ const Sessions = () => {
   return (
     <Box>
         <Box
-        component="form"
-        sx={{
-            '& > :not(style)': { m: 1, width: '25ch' },
-        }}
-        noValidate
-        autoComplete="off"
+            display="flex"
+            justifyContent="flex-end" // To align items to the right
+            alignItems="center" // To vertically center items
+            sx={{ '& > :not(style)': { m: 1 } }}
         >
-            <TextField
-                id="filled-basic"
-                label="Enter a new session name"
-                variant="filled"
-                value={newSessionName}
-                onChange={onNewSessionNameChange}
-            />
-            <IconButton color="primary" aria-label="add to shopping cart" onClick={createNewSession}>
-                <AddShoppingCartIcon />
-            </IconButton>
+        <IconButton color="primary" aria-label="add to shopping cart" onClick={createNewSession}>
+            <AddIcon />
+        </IconButton>
+        <TextField
+            id="filled-basic"
+            label="Enter a new session name"
+            variant="filled"
+            value={newSessionName}
+            onChange={onNewSessionNameChange}
+            style={{ width: '500px' }} // Set the width using a custom style
+        />      
         </Box>
         <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -111,14 +111,13 @@ const Sessions = () => {
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
                 <TableCell component="th" scope="row">
-                {session.name}
+                    <Link to={`/sessions/${session.id}`}>{session.name}</Link>
                 </TableCell>
                 <TableCell align="right">{session.createdBy}</TableCell>
                 <TableCell align="right">{session.status}</TableCell>
                 <TableCell align="right">{session.createdOn}</TableCell>
                 <TableCell align="right">{session.endedOn}</TableCell>
                 <TableCell align="right">
-
                     <IconButton color="secondary" onClick={() => endSession(session.id)}>
                         <StopIcon />
                     </IconButton>

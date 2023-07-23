@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Sessions from './components/Sessions';
+import Session from './components/Session';
 import DrawerAppBar from './components/DrawerAppBar';
 
 const Home = () => (
@@ -27,6 +28,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/sessions" element={<Sessions />} />
+          <Route path="/sessions/:sessionId" element={<Session />} />
         </Routes>
       </div>
     </ThemeProvider>
