@@ -68,3 +68,15 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Workload Identity for GitHub
+
+```bash
+export REPO="aopopov90/reminisce-ui"
+export SA_ID="gh-reminisce@impactful-mode-268210.iam.gserviceaccount.com"
+export WORKLOAD_IDENTITY_POOL_ID="projects/972321173961/locations/global/workloadIdentityPools/gh-reminisce"
+
+gcloud iam service-accounts add-iam-policy-binding "${SA_ID}" \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${REPO}"
+```

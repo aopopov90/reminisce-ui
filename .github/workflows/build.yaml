@@ -36,9 +36,11 @@ jobs:
           node-version: 15
 
       - name: Npm build
+        env:
+          CI: false
         run: |-
           npm install
-          npm build
+          npm run build
 
       - name: Docker build
         run: |-
