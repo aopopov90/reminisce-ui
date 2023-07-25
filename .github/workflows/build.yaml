@@ -1,0 +1,59 @@
+name: Build and deploy
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'feature/**'
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Git Version
+        id: version
+        uses: codacy/git-version@2.7.1
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ vars.WI_PROVIDER }}
+          service_account: ${{ vars.GH_SA }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 15
+
+      - name: Npm build
+        run: |-
+          npm install
+          npm build
+
+      - name: Docker build
+        run: |-
+          image=${{ vars.DOCKER_REPO_REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.DOCKER_REPO_NAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ steps.version.outputs.version }}
+          docker build -t ${image} .
+          docker push ${image}
+
+      - name: Deploy to CloudRun
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: ${{ vars.DOCKER_REPO_NAME }}
+          image: ${{ vars.DOCKER_REPO_REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.DOCKER_REPO_NAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ steps.version.outputs.version }}
+          env_vars: |
+            PORT=80
+
+      - name: Print CloudRun end-point
+        run: 'curl "${{ steps.deploy.outputs.url }}"'
