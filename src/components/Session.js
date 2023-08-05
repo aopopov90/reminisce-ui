@@ -7,8 +7,9 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
-import io from 'socket.io-client';
+import SockJsClient from 'react-stomp';
 
+const SOCKET_URL = 'http://localhost:8080/websocket';
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -16,10 +17,36 @@ const Item = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(2),
     color: theme.palette.text.secondary,
   }));
+ 
+  // const [message, setMessage] = useState('You server message here.');
+
+  
 
 const Session = () => {
   const [sessionData, setSessionData] = useState(null);
   const { sessionId } = useParams(); 
+
+  const onConnected = () => {
+    console.log("Connected!!")
+  }
+
+  const onMessageReceived = (msg) => {
+    // console.log(msg);
+    // var prevSessionData = sessionData;
+    // prevSessionData.comments.push(msg);
+    // console.log(prevSessionData);
+
+    // setSessionData(prevSessionData);
+
+    console.log(msg);
+    
+    const updatedSessionData = {
+      ...sessionData,
+      comments: [...sessionData.comments, msg]
+    };
+
+    setSessionData(updatedSessionData);
+  }
 
   useEffect(() => {
     const fetchSessionData = async () => {
@@ -33,27 +60,6 @@ const Session = () => {
     };
 
     fetchSessionData();
-
-    // Set up WebSocket event listeners
-    const socket = io(API_URL, { path: '/websocket' }); // Connect to the WebSocket server with the correct path
-    socket.on('connect', () => {
-      console.log('Connected to WebSocket server');
-    });
-
-    socket.on('/topic/newComment', (newComment) => {
-      // Handle the newly received comment from the WebSocket
-      console.log('New comment received:', newComment);
-
-      // Update the new comments state with the new comment
-    //   setNewComments((prevComments) => [...prevComments, newComment]);
-    });
-
-    // Clean up WebSocket event listeners when the component unmounts
-    return () => {
-      socket.disconnect(); // Disconnect the WebSocket when the component unmounts
-      socket.off('connect');
-      socket.off('/topic/newComment');
-    };
   }, [sessionId]); // Add sessionId as a dependency to the useEffect hook
 
   if (!sessionData) {
@@ -62,6 +68,14 @@ const Session = () => {
 
   return (
     <div>
+      <SockJsClient
+        url={SOCKET_URL}
+        topics={['/topic/newComment']}
+        onConnect={onConnected}
+        onDisconnect={console.log("Disconnected!")}
+        onMessage={msg => onMessageReceived(msg)}
+        debug={false}
+      />
       <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
         <Grid item xs={4}>
