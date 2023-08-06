@@ -80,17 +80,17 @@ const Sessions = () => {
             alignItems="center" // To vertically center items
             sx={{ '& > :not(style)': { m: 1 } }}
         >
-        <IconButton color="primary" aria-label="add to shopping cart" onClick={createNewSession}>
-            <AddIcon />
-        </IconButton>
-        <TextField
-            id="filled-basic"
-            label="Enter a new session name"
-            variant="filled"
-            value={newSessionName}
-            onChange={onNewSessionNameChange}
-            style={{ width: '500px' }} // Set the width using a custom style
-        />      
+          <IconButton color="primary" aria-label="add to shopping cart" onClick={createNewSession}>
+              <AddIcon />
+          </IconButton>
+          <TextField
+              id="filled-basic"
+              label="Enter a new session name"
+              variant="filled"
+              value={newSessionName}
+              onChange={onNewSessionNameChange}
+              style={{ width: '500px' }} // Set the width using a custom style
+          />
         </Box>
         <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">

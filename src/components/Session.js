@@ -2,56 +2,60 @@ import React, { useState, useEffect } from 'react';
 import { API_URL } from '../config/config';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import SockJsClient from 'react-stomp';
+import CommentInput from './CommentInput'; // Renamed from CategoryInput
+import CommentSection from './CommentSection';
 
-const SOCKET_URL = 'http://localhost:8080/websocket';
+const SOCKET_URL = `${API_URL}/websocket`;
 
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(2),
-    color: theme.palette.text.secondary,
-  }));
- 
-  // const [message, setMessage] = useState('You server message here.');
-
-  
+const categories = [
+  { id: 1, label: "What went well?", color: "success" },
+  { id: 2, label: "What could be improved", color: "warning" },
+  { id: 3, label: "An idea to share", color: "secondary" }
+];
 
 const Session = () => {
   const [sessionData, setSessionData] = useState(null);
-  const { sessionId } = useParams(); 
+  const { sessionId } = useParams();
+  const [newComments, setNewComments] = useState({});
 
-  const onConnected = () => {
-    console.log("Connected!!")
-  }
+  const onNewCommentChange = (categoryId, value) => {
+    setNewComments(prevComments => ({
+      ...prevComments,
+      [categoryId]: value
+    }));
+  };
 
-  const onMessageReceived = (msg) => {
-    // console.log(msg);
-    // var prevSessionData = sessionData;
-    // prevSessionData.comments.push(msg);
-    // console.log(prevSessionData);
-
-    // setSessionData(prevSessionData);
-
-    console.log(msg);
-    
+  const onCommentReceived = (comment) => {
     const updatedSessionData = {
       ...sessionData,
-      comments: [...sessionData.comments, msg]
+      comments: [...sessionData.comments, comment]
     };
-
     setSessionData(updatedSessionData);
   }
+
+  const createComment = async (categoryId) => {
+    try {
+      const response = await axios.post(`${API_URL}/comments`, {
+        sessionId: sessionId,
+        text: newComments[categoryId],
+        categoryId: categoryId
+      });
+      setNewComments(prevComments => ({
+        ...prevComments,
+        [categoryId]: ''
+      }));
+    } catch (error) {
+      console.error('Error submitting data:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchSessionData = async () => {
       try {
-        console.log(`sessionId: ${sessionId}`);
         const response = await axios.get(`${API_URL}/sessions/${sessionId}`);
         setSessionData(response.data);
       } catch (error) {
@@ -60,7 +64,7 @@ const Session = () => {
     };
 
     fetchSessionData();
-  }, [sessionId]); // Add sessionId as a dependency to the useEffect hook
+  }, [sessionId]);
 
   if (!sessionData) {
     return <div>Loading...</div>;
@@ -71,43 +75,30 @@ const Session = () => {
       <SockJsClient
         url={SOCKET_URL}
         topics={['/topic/newComment']}
-        onConnect={onConnected}
-        onDisconnect={console.log("Disconnected!")}
-        onMessage={msg => onMessageReceived(msg)}
+        onDisconnect={() => console.log("Disconnected!")}
+        onMessage={msg => onCommentReceived(msg)}
         debug={false}
       />
-      <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
-            <Stack spacing={2}>
-                {sessionData.comments.map((comment) => {
-                    if (comment.categoryId == 1) {
-                        return (<Item>{comment.text}</Item>);
-                    }
-                })}
-            </Stack>
+      <Box sx={{ flexGrow: 1, padding: 2 }}>
+        <Grid container spacing={2}>
+          {categories.map((category) => (
+            <Grid item xs={4} key={category.id}>
+              <Stack spacing={2}>
+                <CommentInput
+                  label={category.label}
+                  color={category.color}
+                  categoryId={category.id}
+                  value={newComments[category.id] || ''}
+                  onChange={onNewCommentChange}
+                  onSubmit={createComment}
+                />
+                <CommentSection sessionData={sessionData} categoryId={category.id} />
+              </Stack>
+            </Grid>
+          ))}
         </Grid>
-        <Grid item xs={4}>
-        <Stack spacing={2}>
-                {sessionData.comments.map((comment) => {
-                    if (comment.categoryId == 2) {
-                        return (<Item>{comment.text}</Item>);
-                    }
-                })}
-            </Stack>
-        </Grid>
-        <Grid item xs={4}>
-        <Stack spacing={2}>
-                {sessionData.comments.map((comment) => {
-                    if (comment.categoryId == 3) {
-                        return (<Item>{comment.text}</Item>);
-                    }
-                })}
-            </Stack>
-        </Grid>
-      </Grid>
-    </Box>
-      <pre>{JSON.stringify(sessionData, null, 2)}</pre>
+      </Box>
+      <pre>{JSON.stringify(newComments, null, 2)}</pre>
     </div>
   );
 };
