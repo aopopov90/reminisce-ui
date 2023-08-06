@@ -19,7 +19,7 @@ const CommentInput = ({ label, color, categoryId, value, onChange, onSubmit }) =
       }}
       InputProps={{
         endAdornment: (
-          <InputAdornment>
+          <InputAdornment position="end">
             <IconButton edge="end" onClick={() => onSubmit(categoryId)}>
               <AddIcon />
             </IconButton>

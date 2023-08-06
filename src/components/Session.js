@@ -37,6 +37,29 @@ const Session = () => {
     setSessionData(updatedSessionData);
   }
 
+  const onReactionReceived = (reaction) => {
+    console.log(reaction);
+    // Find the index of the comment to update
+    const commentIndex = sessionData.comments.findIndex(comment => comment.id === reaction.commentId);
+  
+    if (commentIndex !== -1) {
+      // Create a copy of the comments array to update
+      const updatedComments = [...sessionData.comments];
+      
+      // Update the reactions for the specific comment
+      updatedComments[commentIndex] = {
+        ...updatedComments[commentIndex],
+        reactions: [...updatedComments[commentIndex].reactions, reaction]
+      };
+
+      // Update the sessionData with the updated comments array
+      setSessionData(prevSessionData => ({
+        ...prevSessionData,
+        comments: updatedComments
+      }));
+    }
+  }
+
   const createComment = async (categoryId) => {
     try {
       const response = await axios.post(`${API_URL}/comments`, {
@@ -48,6 +71,17 @@ const Session = () => {
         ...prevComments,
         [categoryId]: ''
       }));
+    } catch (error) {
+      console.error('Error submitting data:', error);
+    }
+  };
+
+  const likeComment = async (commentId) => {
+    try {
+      const response = await axios.post(`${API_URL}/reactions`, {
+        commentId: commentId,
+        reactionType: 'LIKE'
+      });
     } catch (error) {
       console.error('Error submitting data:', error);
     }
@@ -79,6 +113,13 @@ const Session = () => {
         onMessage={msg => onCommentReceived(msg)}
         debug={false}
       />
+      <SockJsClient
+        url={SOCKET_URL}
+        topics={['/topic/newReaction']}
+        onDisconnect={() => console.log("Disconnected!")}
+        onMessage={msg => onReactionReceived(msg)}
+        debug={false}
+      />
       <Box sx={{ flexGrow: 1, padding: 2 }}>
         <Grid container spacing={2}>
           {categories.map((category) => (
@@ -92,13 +133,17 @@ const Session = () => {
                   onChange={onNewCommentChange}
                   onSubmit={createComment}
                 />
-                <CommentSection sessionData={sessionData} categoryId={category.id} />
+                <CommentSection 
+                  sessionData={sessionData}
+                  categoryId={category.id}
+                  onSubmit={likeComment}
+                />
               </Stack>
             </Grid>
           ))}
         </Grid>
       </Box>
-      <pre>{JSON.stringify(newComments, null, 2)}</pre>
+      <pre>{JSON.stringify(sessionData, null, 2)}</pre>
     </div>
   );
 };
