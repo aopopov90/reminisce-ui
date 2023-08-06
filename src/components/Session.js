@@ -1,4 +1,3 @@
-// Session.js
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../config/config';
 import axios from 'axios';
