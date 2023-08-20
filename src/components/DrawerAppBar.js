@@ -6,26 +6,25 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 const navItems = [
   {'item': 'Home', 'path': '/'},
   {'item': 'Sessions','path': '/sessions'},
-  {'item': 'Contact', 'path': '/contact'}
+  {'item': 'Contact', 'path': '/contact'},
+  {'item': 'Login', 'path': '/login'}
 ];
 
 function DrawerAppBar(props) {
   const navigate = useNavigate();
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const { authState } = useAuth(); // Get authState from the context
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
@@ -65,8 +64,17 @@ function DrawerAppBar(props) {
               </Button>
             ))}
           </Box>
+          <Box component="nav">
+            {/* Display authenticated user's email */}
+            {authState.token && (
+              <Typography variant="body2" color="text.primary">
+                Welcome, {authState.user.email}
+              </Typography>
+            )}
+          </Box>
         </Toolbar>
       </AppBar>
+      
       <Box component="nav">
       </Box>
       <Box component="main" sx={{ p: 1 }}>

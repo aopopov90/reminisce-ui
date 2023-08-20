@@ -15,7 +15,6 @@ import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import StopIcon from '@mui/icons-material/Stop';
-import Session from './Session';
 
 const Sessions = () => {
   const [sessions, setSessions] = useState([]);
@@ -62,6 +61,7 @@ const Sessions = () => {
   useEffect(() => {
     const fetchSessions = async () => {
         try {
+            console.log('Fetching sessions')
             const response = await axios.get(`${API_URL}/sessions`);
             setSessions(response.data);
         } catch (error) {
