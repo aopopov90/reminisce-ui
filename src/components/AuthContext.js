@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
+import { API_URL } from '../config/config';
 
 // Define constants
 const TOKEN_COOKIE_EXPIRY_DAYS = 7;
@@ -47,15 +48,50 @@ const authReducer = (state, action) => {
 // Create the authentication context
 const AuthContext = createContext();
 
+
 // Create an AuthProvider component to provide the context value
 export const AuthProvider = ({ children }) => {
   const [authState, authDispatch] = useReducer(authReducer, initialAuthState);
 
+  const handleTokenRefresh = async () => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/v1/auth/refresh`,
+        { token: authState.token }, // Send the token in the request body
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const refreshedData = response.data;
+      authDispatch({ type: SET_TOKEN, payload: refreshedData.token });
+    } catch (error) {
+      console.error('Token refresh error:', error.message);
+    }
+  };
+  
   // Set the authorization header whenever the token changes
   useEffect(() => {
     if (authState.token) {
+      // Check if the token is close to expiration and refresh it
+      const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+      if (authState.tokenExpiration - currentTime <= 300) {
+        handleTokenRefresh();
+      }
+      // Set the authorization header with the token
       console.log(`Setting axios default header to: ${authState.token}`)
       axios.defaults.headers.common['Authorization'] = `Bearer ${authState.token}`;
+
+      // Set up an interval to periodically check and refresh the token
+      const tokenRefreshInterval = setInterval(() => {
+        // if (authState.tokenExpiration - currentTime <= 300) {
+            handleTokenRefresh();
+        // }
+      }, 60000); // Check every 60 seconds
+  
+      // Clean up the interval when unmounting
+      return () => clearInterval(tokenRefreshInterval);
     } else {
       console.log('Deleting axios header')
       delete axios.defaults.headers.common['Authorization'];

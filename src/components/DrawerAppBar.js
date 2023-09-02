@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import ActiveUserAvatar from './ActiveUserAvatar';
 
 const navItems = [
   {'item': 'Home', 'path': '/'},
@@ -39,7 +40,7 @@ function DrawerAppBar(props) {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar component="nav">
+      <AppBar component="nav" position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -65,12 +66,7 @@ function DrawerAppBar(props) {
             ))}
           </Box>
           <Box component="nav">
-            {/* Display authenticated user's email */}
-            {authState.token && (
-              <Typography variant="body2" color="text.primary">
-                Welcome, {authState.user.email}
-              </Typography>
-            )}
+            <ActiveUserAvatar/>
           </Box>
         </Toolbar>
       </AppBar>
@@ -85,10 +81,6 @@ function DrawerAppBar(props) {
 }
 
 DrawerAppBar.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * You won't need it on your project.
-   */
   window: PropTypes.func,
 };
 

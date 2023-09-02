@@ -3,18 +3,45 @@ import { TextField, Button, Container, Grid, Typography } from '@mui/material';
 import { useAuth } from './AuthContext';
 import { API_URL } from '../config/config';
 import jwt_decode from 'jwt-decode';
-import Cookies from 'js-cookie';
 
 const AuthPage = () => {
-  const { authDispatch } = useAuth(); // Get authDispatch from the context
-  const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [password, setPassword] = useState('');
-  const [showRegistrationForm, setShowRegistrationForm] = useState(false); // State to control form visibility
+  const { authDispatch } = useAuth();
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [registerFirstName, setRegisterFirstName] = useState('');
+  const [registerLastName, setRegisterLastName] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [showRegistrationForm, setShowRegistrationForm] = useState(false);
 
   const handleLoginSubmit = async () => {
-    // ... Login submit logic
+    try {
+      // Make API call to authenticate the user
+      const response = await fetch(`${API_URL}/api/v1/auth/authenticate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+      });
+      const data = await response.json();
+
+      // Decode the JWT token to extract user information
+      const decodedToken = jwt_decode(data.token);
+      const userEmail = decodedToken.sub; // Assuming the email is stored in the 'sub' claim
+
+      // Set the token as a cookie with an expiration date
+      authDispatch({ type: 'SET_TOKEN', payload: data.token });
+
+      // Dispatch action to update the context with the new token and user email
+      authDispatch({ type: 'SET_USER_INFO', payload: { email: userEmail } });
+
+      // Handle successful login
+      console.log('Logged in successfully:', data.token);
+    } catch (error) {
+      // Handle login error
+      console.error('Login error:', error.message);
+    }
   };
 
   const handleRegisterSubmit = async () => {
@@ -25,21 +52,25 @@ const AuthPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ firstName, lastName, email, password }),
+        body: JSON.stringify({
+          firstName: registerFirstName,
+          lastName: registerLastName,
+          email: registerEmail,
+          password: registerPassword,
+        }),
       });
       const data = await response.json();
-  
+
       // Decode the JWT token to extract user information
       const decodedToken = jwt_decode(data.token);
       const userEmail = decodedToken.sub; // Assuming the email is stored in the 'sub' claim
-      console.log(`User: ${userEmail}`);
-  
+
       // Set the token as a cookie with an expiration date
       authDispatch({ type: 'SET_TOKEN', payload: data.token });
-  
+
       // Dispatch action to update the context with the new token and user email
       authDispatch({ type: 'SET_USER_INFO', payload: { email: userEmail } });
-  
+
       // Handle successful registration
       console.log('Registered and logged in successfully:', data.token);
     } catch (error) {
@@ -61,8 +92,8 @@ const AuthPage = () => {
             label="Email"
             variant="outlined"
             fullWidth
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={loginEmail}
+            onChange={(e) => setLoginEmail(e.target.value)}
             style={{ marginBottom: '1rem' }}
           />
           <TextField
@@ -70,15 +101,14 @@ const AuthPage = () => {
             type="password"
             variant="outlined"
             fullWidth
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={loginPassword}
+            onChange={(e) => setLoginPassword(e.target.value)}
             style={{ marginBottom: '1rem' }}
           />
           <Button variant="contained" color="primary" fullWidth onClick={handleLoginSubmit}>Login</Button>
         </Grid>
         <Grid item xs={12}>
           <Typography variant="h4" align="center">Register</Typography>
-          {/* Show the registration form when the "Register" button is clicked */}
           {!showRegistrationForm ? (
             <Button variant="contained" color="primary" fullWidth onClick={toggleRegistrationForm}>
               Register
@@ -89,24 +119,24 @@ const AuthPage = () => {
                 label="First Name"
                 variant="outlined"
                 fullWidth
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                value={registerFirstName}
+                onChange={(e) => setRegisterFirstName(e.target.value)}
                 style={{ marginBottom: '1rem' }}
               />
               <TextField
                 label="Last Name"
                 variant="outlined"
                 fullWidth
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                value={registerLastName}
+                onChange={(e) => setRegisterLastName(e.target.value)}
                 style={{ marginBottom: '1rem' }}
               />
               <TextField
                 label="Email"
                 variant="outlined"
                 fullWidth
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={registerEmail}
+                onChange={(e) => setRegisterEmail(e.target.value)}
                 style={{ marginBottom: '1rem' }}
               />
               <TextField
@@ -114,8 +144,8 @@ const AuthPage = () => {
                 type="password"
                 variant="outlined"
                 fullWidth
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={registerPassword}
+                onChange={(e) => setRegisterPassword(e.target.value)}
                 style={{ marginBottom: '1rem' }}
               />
               <Button variant="contained" color="primary" fullWidth onClick={handleRegisterSubmit}>
