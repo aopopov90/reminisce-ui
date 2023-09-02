@@ -4,10 +4,12 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import SockJsClient from 'react-stomp';
 import CommentInput from './CommentInput'; // Renamed from CategoryInput
 import CommentSection from './CommentSection';
+import DrawerSessionBar from './DrawerSessionBar';
 
 const SOCKET_URL = `${API_URL}/websocket`;
 
@@ -123,7 +125,7 @@ const Session = () => {
       <Box sx={{ flexGrow: 1, padding: 2 }}>
         <Grid container spacing={2}>
           {categories.map((category) => (
-            <Grid item xs={4} key={category.id}>
+            <Grid item xs key={category.id}>
               <Stack spacing={2}>
                 <CommentInput
                   label={category.label}
@@ -141,9 +143,14 @@ const Session = () => {
               </Stack>
             </Grid>
           ))}
+          <DrawerSessionBar
+            sessionId={sessionId}
+          />
         </Grid>
+        
       </Box>
       <pre>{JSON.stringify(sessionData, null, 2)}</pre>
+      
     </div>
   );
 };

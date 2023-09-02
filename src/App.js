@@ -5,6 +5,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Sessions from './components/Sessions';
 import Session from './components/Session';
 import DrawerAppBar from './components/DrawerAppBar';
+import AuthPage from './components/AuthPage';
+import { AuthProvider } from './components/AuthContext';
 
 const Home = () => (
   <div>
@@ -20,19 +22,22 @@ const darkTheme = createTheme({
 });
 
 const App = () => (
-  <Router>
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <div>
-        <DrawerAppBar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/sessions" element={<Sessions />} />
-          <Route path="/sessions/:sessionId" element={<Session />} />
-        </Routes>
-      </div>
-    </ThemeProvider>
-  </Router>
+  <AuthProvider>
+    <Router>
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <div>
+          <DrawerAppBar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/sessions" element={<Sessions />} />
+            <Route path="/sessions/:sessionId" element={<Session />} />
+            <Route path="/login" element={<AuthPage />} />
+          </Routes>
+        </div>
+      </ThemeProvider>
+    </Router>
+  </AuthProvider>
 );
 
 export default App;
