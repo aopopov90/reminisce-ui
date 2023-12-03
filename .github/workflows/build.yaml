@@ -62,7 +62,7 @@ jobs:
           service: ${{ vars.DOCKER_IMAGE_NAME }}-staging
           image: ${{ vars.DOCKER_REPO_REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.DOCKER_REPO_NAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ steps.version.outputs.version }}
           env_vars: |
-            REACT_APP_API_URL=${{ vars.REACT_APP_API_URL }}
+            API_URL=${{ vars.REACT_APP_API_URL }}
 
 
       - name: Print CloudRun end-point
