@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Get the value of the API_URL environment variable
 API_URL=${API_URL:-"http://localhost"}
 
