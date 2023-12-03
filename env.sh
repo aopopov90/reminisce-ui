@@ -1,5 +1,13 @@
-#!/bin/sh
-# line endings must be \n, not \r\n !
-echo "window._env_ = {" > ./env-config.js
-awk -F '=' '{ print $1 ": \"" (ENVIRON[$1] ? ENVIRON[$1] : $2) "\"," }' ./.env >> ./env-config.js
-echo "}" >> ./env-config.js
+#!/bin/bash
+
+# Get the value of the API_URL environment variable
+API_URL=${API_URL:-"http://localhost"}
+
+# Create the env-config.js file
+cat <<EOL > env-config.js
+window._env_ = {
+  API_URL: "${API_URL}",
+};
+EOL
+
+echo "env-config.js generated successfully with API_URL=${API_URL}"
