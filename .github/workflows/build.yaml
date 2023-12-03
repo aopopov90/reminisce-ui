@@ -59,8 +59,11 @@ jobs:
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v1
         with:
-          service: ${{ vars.DOCKER_IMAGE_NAME }}
+          service: ${{ vars.DOCKER_IMAGE_NAME }}-staging
           image: ${{ vars.DOCKER_REPO_REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.DOCKER_REPO_NAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ steps.version.outputs.version }}
+          env_vars: |
+            REACT_APP_API_URL=${{ vars.REACT_APP_API_URL }}
+
 
       - name: Print CloudRun end-point
         run: 'curl "${{ steps.deploy.outputs.url }}"'
