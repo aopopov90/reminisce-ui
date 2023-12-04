@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build:
-    environment: staging
+    environment: ${{ github.ref == 'refs/heads/release/*' && 'staging' || 'uat' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
