@@ -1,5 +1,5 @@
 # Get the directory of the script
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 # Get the value of the API_URL environment variable
 API_URL=${API_URL:-"http://localhost"}
