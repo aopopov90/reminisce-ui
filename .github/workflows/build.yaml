@@ -10,9 +10,12 @@ permissions:
   contents: 'read'
   id-token: 'write'
 
+env:
+  DEPL_ENV: ${{ contains(github.ref, 'refs/heads/release/') && 'staging' || 'uat' }}
+
 jobs:
   build:
-    environment: ${{ contains(github.ref, 'refs/heads/release/') && 'staging' || 'uat' }}
+    environment: ${{ env.DEPL_ENV }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
