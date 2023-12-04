@@ -78,6 +78,6 @@ jobs:
           image: ${{ vars.DOCKER_REPO_REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.DOCKER_REPO_NAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ steps.version.outputs.version }}
           env_vars: |
             API_URL=${{ vars.API_URL }}
-
+            
       - name: Print CloudRun end-point
         run: 'curl "${{ steps.deploy.outputs.url }}"'
