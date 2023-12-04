@@ -15,7 +15,7 @@ env:
 
 jobs:
   build:
-    environment: ${{ env.DEPL_ENV }}
+    environment: ${DEPL_ENV}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
