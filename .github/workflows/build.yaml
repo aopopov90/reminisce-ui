@@ -11,11 +11,11 @@ permissions:
   id-token: 'write'
 
 env:
-  DEPL_ENV: ${{ contains(github.ref, 'refs/heads/release/') && 'staging' || 'uat' }}
+  DEPLOY_TARGET: ${{ contains(github.ref, 'refs/heads/release/') && 'uat' || 'staging' }}
 
 jobs:
   build:
-    environment: ${DEPL_ENV}
+    environment: ${DEPLOY_TARGET}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -63,7 +63,7 @@ jobs:
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v1
         with:
-          service: ${{ vars.DOCKER_IMAGE_NAME }}-staging
+          service: ${{ vars.DOCKER_IMAGE_NAME }}-${DEPLOY_TARGET}
           image: ${{ vars.DOCKER_REPO_REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.DOCKER_REPO_NAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ steps.version.outputs.version }}
           env_vars: |
             API_URL=${{ vars.API_URL }}
