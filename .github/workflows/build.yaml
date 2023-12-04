@@ -10,9 +10,6 @@ permissions:
   contents: 'read'
   id-token: 'write'
 
-# env:
-#   DEPLOY_TARGET: ${{ github.ref == 'refs/heads/main' && 'uat' || 'staging' }}
-
 jobs:
   build:
     environment: ${{ github.ref == 'refs/heads/main' && 'uat' || 'staging' }}
