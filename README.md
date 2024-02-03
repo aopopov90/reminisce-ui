@@ -73,8 +73,8 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 ```bash
 export REPO="aopopov90/reminisce-ui"
-export SA_ID="gh-reminisce@impactful-mode-268210.iam.gserviceaccount.com"
-export WORKLOAD_IDENTITY_POOL_ID="projects/972321173961/locations/global/workloadIdentityPools/gh-reminisce"
+export SA_ID="gh-reminisce@protean-atom-410915.iam.gserviceaccount.com"
+export WORKLOAD_IDENTITY_POOL_ID="projects/53721505590/locations/global/workloadIdentityPools/gh-reminisce"
 
 gcloud iam service-accounts add-iam-policy-binding "${SA_ID}" \
   --role="roles/iam.workloadIdentityUser" \
