@@ -76,6 +76,7 @@ jobs:
         with:
           service: ${{ vars.DOCKER_IMAGE_NAME }}-${{ github.ref == 'refs/heads/main' && 'uat' || 'staging' }}
           image: ${{ vars.DOCKER_REPO_REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/${{ vars.DOCKER_REPO_NAME }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ steps.version.outputs.version }}
+          region: europe-west2
           env_vars: |
             API_URL=${{ vars.API_URL }}
             
