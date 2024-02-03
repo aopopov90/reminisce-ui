@@ -3,6 +3,13 @@ import { TextField, Button, Container, Grid, Typography } from '@mui/material';
 import { useAuth } from './AuthContext';
 import { API_URL } from '../config/config';
 import jwt_decode from 'jwt-decode';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+
+const config = {
+  apiKey: 'AIzaSyA7s_URPH4wqeG5HDwaO04Iiup96sAltVY',
+  authDomain: 'protean-atom-410915.firebaseapp.com',
+};
 
 const AuthPage = () => {
   const { authDispatch } = useAuth();
@@ -87,6 +94,17 @@ const AuthPage = () => {
     <Container maxWidth="xs">
       <Grid container spacing={2}>
         <Grid item xs={12}>
+
+          <Button
+            variant="contained" color="warning" fullWidth
+            onClick={() => {
+              firebase.initializeApp(config);
+              const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
+              firebase.auth().signInWithPopup(googleAuthProvider);
+            }}
+          >
+            Sign In with Google
+          </Button>
           <Typography variant="h4" align="center">Login</Typography>
           <TextField
             label="Email"
