@@ -65,14 +65,14 @@ const Sessions = () => {
         try {
             console.log('Fetching sessions')
             const token = await firebase.auth().currentUser.getIdToken();
-            const response = await axios.get(`${API_URL}/sessions`, Headers);
             var headers = {}
             if (firebase.auth().currentUser) {
               headers = {
                 'Authorization': `Bearer ${token}`
               };
             }
-            setSessions(response.data, {headers: headers});
+            const response = await axios.get(`${API_URL}/sessions`, {headers: headers});
+            setSessions(response.data);
         } catch (error) {
             console.error('Error fetching sessions:', error);
         }
