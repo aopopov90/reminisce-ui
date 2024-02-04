@@ -15,6 +15,8 @@ import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import StopIcon from '@mui/icons-material/Stop';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 
 const Sessions = () => {
   const [sessions, setSessions] = useState([]);
@@ -62,8 +64,15 @@ const Sessions = () => {
     const fetchSessions = async () => {
         try {
             console.log('Fetching sessions')
-            const response = await axios.get(`${API_URL}/sessions`);
-            setSessions(response.data);
+            const token = await firebase.auth().currentUser.getIdToken();
+            const response = await axios.get(`${API_URL}/sessions`, Headers);
+            var headers = {}
+            if (firebase.auth().currentUser) {
+              headers = {
+                'Authorization': `Bearer ${token}`
+              };
+            }
+            setSessions(response.data, {headers: headers});
         } catch (error) {
             console.error('Error fetching sessions:', error);
         }
